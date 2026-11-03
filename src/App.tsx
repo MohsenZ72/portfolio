@@ -1,73 +1,41 @@
-import { useRef } from 'react'
-import { useGSAP } from '@gsap/react'
-import { About } from './components/sections/About'
-import { Contact } from './components/sections/Contact'
-import { Experience } from './components/sections/Experience'
-import { Hero } from './components/sections/Hero'
-import { Skills } from './components/sections/Skills'
-import { TechStack3D } from './components/sections/TechStack3D'
-import { Nav } from './components/layout/Nav'
-import { ProgressBar } from './components/layout/ProgressBar'
-import { SmoothScroll } from './components/layout/SmoothScroll'
-import { useScrollProgress } from './hooks/useScrollProgress'
+import { lazy, Suspense, useState } from 'react'
+import { Nav } from './components/Nav'
+import { Preloader } from './components/Preloader'
+import { useMediaQuery } from './hooks/useMediaQuery'
 import { useReducedMotion } from './hooks/useReducedMotion'
-import { gsap, ScrollTrigger } from './lib/gsap'
+import { useSmoothScroll } from './lib/scroll'
+import { Contact } from './sections/Contact'
+import { Hero } from './sections/Hero'
+import { Roots } from './sections/Roots'
+import { Work } from './sections/Work'
 
-function App() {
-  const rootRef = useRef<HTMLDivElement>(null)
-  const { setProgress } = useScrollProgress()
-  const reducedMotion = useReducedMotion()
+// Three.js is ~1 MB: load it after the text so the page reads instantly.
+const Scene = lazy(() => import('./three/Scene').then((m) => ({ default: m.Scene })))
 
-  useGSAP(
-    () => {
-      ScrollTrigger.create({
-        trigger: document.body,
-        start: 'top top',
-        end: 'bottom bottom',
-        onUpdate: (self) => setProgress(self.progress),
-      })
+export default function App() {
+  const reduced = useReducedMotion()
+  const compact = useMediaQuery('(max-width: 820px)')
+  const motion = !reduced
+  const [ready, setReady] = useState(!motion)
 
-      if (!reducedMotion) {
-        const sections = gsap.utils.toArray<HTMLElement>('[data-reveal]')
-        sections.forEach((section) => {
-          gsap.from(section, {
-            autoAlpha: 0,
-            y: 36,
-            duration: 1.4,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 82%',
-              end: 'top 58%',
-              scrub: 0.25,
-            },
-          })
-        })
-      }
-    },
-    { scope: rootRef, dependencies: [reducedMotion, setProgress] },
-  )
+  useSmoothScroll(motion && !compact)
 
   return (
-    <SmoothScroll>
-      <a className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50" href="#hero">
+    <>
+      <a className="skip" href="#roots">
         Skip to content
       </a>
-      <ProgressBar />
+      <Suspense fallback={<div className="scene-fallback" aria-hidden="true" />}>
+        <Scene motion={motion} compact={compact} />
+      </Suspense>
+      <Preloader motion={motion} onDone={() => setReady(true)} />
       <Nav />
-
-      <div ref={rootRef} className="relative">
-        <main>
-          <Hero />
-          <About />
-          <TechStack3D />
-          <Skills />
-          <Experience />
-          <Contact />
-        </main>
-      </div>
-    </SmoothScroll>
+      <main>
+        <Hero ready={ready} motion={motion} />
+        <Roots motion={motion} />
+        <Work motion={motion} />
+        <Contact />
+      </main>
+    </>
   )
 }
-
-export default App

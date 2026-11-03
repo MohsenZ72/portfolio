@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mohsenz72.github.io/portfolio/sitemap.xml

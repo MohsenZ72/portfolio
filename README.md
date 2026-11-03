@@ -1,32 +1,25 @@
-# React + TypeScript + Vite
+# Mohsen Zare — portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Live: https://mohsenz72.github.io/portfolio/
 
-Currently, two official plugins are available:
+**From roots to networks.** One WebGL particle field (28,000 points, no 3D models) tells the story while you scroll:
+a seed (hero) grows into a root system (background in agriculture → software), the roots rewire into a network graph
+of the products I build, and the graph settles into a signal (contact). Colours come from Westland greenhouses at night,
+lit by magenta and blue grow-lights.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
+React 19 · TypeScript · Vite · React Three Fiber · custom GLSL point shader · postprocessing (bloom) · GSAP (SplitText, ScrollTrigger) · Lenis · Tailwind CSS 4
 
-## React Compiler
+## How it works
+- `src/three/shapes.ts` builds four deterministic point clouds (seed, roots, network, signal).
+- `src/three/Field.tsx` morphs between them in the vertex shader; the stage is driven by scroll (`src/lib/scroll.ts`).
+- Hovering a project lights up its hub in the graph.
+- All content is plain DOM (`src/data/profile.ts`), so it reads without WebGL. Reduced motion stops the animation; there is a static fallback when WebGL is missing; Three.js is lazy-loaded after the text.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Develop
+```bash
+npm ci
+npm run dev
+npm run build   # GITHUB_PAGES=true for the /portfolio/ base path
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Deploys to GitHub Pages on every push to `main` (`.github/workflows/deploy.yml`).
