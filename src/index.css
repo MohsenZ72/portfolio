@@ -549,3 +549,17 @@ main {
     scroll-behavior: auto !important;
   }
 }
+
+/* Pre-JS copy for crawlers; replaced by React on mount. */
+.static-copy {
+  max-width: 40rem;
+  padding: 6rem var(--gutter);
+  color: var(--color-mist);
+}
+.static-copy h1 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: var(--color-chalk);
+  margin: 0 0 1rem;
+}
